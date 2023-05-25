@@ -6,7 +6,7 @@ include(pico_sdk_import.cmake)
 
 # Se valida que PICO_SDK_PATH exista
 if (NOT PICO_SDK_PATH)
-    message(FATAL_ERROR "?PICO_SDK_PATH? (not set)")
+    message(FATAL_ERROR "?PICO_SDK_PATH?")
 endif()
 
 # Se define nombre del proyecto
