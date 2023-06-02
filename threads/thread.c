@@ -1,15 +1,102 @@
 #include "threads/thread.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include "semaphore/semaphore.c"
+
+// se define pin del led
+#define LED_PIN 0
 
 int randomPriority(void) {
     srand((unsigned) time(0));
     return rand() % 6;
 }
 
-void thread_function(void) {
+void thread_function(struct thread *t) {
+    ASSERT (t != NULL);
+    while(1) {
+        if (t->status == THREAD_DYING) // verifica si el thread esta en estatus THREAD_DYING
+        {
+            printf("Thread dying, ID: %d .\n", t->tid);
+            sleep_ms(1000);
+            continue;
+        }
+        if (t->status == THREAD_BLOCKED)// verifica si el thread esta en estatus THREAD_BLOCKED
+        {
+            printf("Thread blocked, ID: %d .\n", t->tid);
+            sleep_ms(1000);
+        }
+        if (t->status == THREAD_READY)// verifica si el thread esta en estatus THREAD_BLOCKED
+        {
+            printf("Thread ready, ID: %d .\n", t->tid);
+            sleep_ms(1000);
+        }
+        if (t->status == THREAD_RUNNING)// verifica si el thread esta en estatus THREAD_RUNNING
+        {
+            //Realiza el acquire del semaforo
+            sema_acquire(&led_sema);
+            printf("Thread acquired the semaphore, ID %d .\n", t->tid);
 
+            //Se muestra el estado del thread
+            if (t->status == THREAD_DYING)
+            {
+                printf("State dying.\n");
+            }
+            if (t->status == THREAD_BLOCKED)
+            {
+                printf("State blocked.\n");
+            }
+            if (t->status == THREAD_RUNNING)
+            {
+                printf("State running.\n");
+            }
+
+            // Toggle the LED
+            gpio_put(LED_PIN, 1);
+            sleep_ms(300);
+            gpio_put(LED_PIN, 0);
+            sleep_ms(300);
+
+            // Realiza el release del semaforo
+            sema_release(&led_sema);
+            printf("Thread released the semaphore, ID %d .\n", t->tid);
+
+            //Se muestra el estado del thread
+            if (t->status == THREAD_DYING)
+            {
+                printf("State dying.\n");
+            }
+            if (t->status == THREAD_BLOCKED)
+            {
+                printf("State blocked.\n");
+            }
+            if (t->status == THREAD_RUNNING)
+            {
+                printf("State running.\n");
+            }
+        }
+        yield();
+    }
+}
+
+void yield(void)
+{
+    int next_thread = 0;
+    for (int i = 0; i < THREAD_CREATE; i++)
+    {
+        if (current_thread->tid != control_block[i].tid)
+        {
+            next_thread = i;
+        }
+
+    }
+    if (current_thread->status = THREAD_BLOCKED)
+    {
+        control_block[current_thread->tid-1].status = THREAD_DYING;
+    }
+    if (current_thread->status = THREAD_RUNNING)
+    {
+        control_block[current_thread->tid-1].status = THREAD_BLOCKED;
+    }
+    control_block[next_thread].status = THREAD_RUNNING;
+    current_thread = &control_block[next_thread];
 }
 
 void thread_init(void)
@@ -22,7 +109,8 @@ void thread_init(void)
         control_block[i].status = THREAD_RUNNING; 
         control_block[i].name = "Welt" + i;
         control_block[i].priority = priority;
-        control_block[i].time_asleep = 0;
-        control_block[i].function = thread_function;
+        control_block[i].priority_original = priority;
+        control_block[i].remaining_time = 0;
+        //control_block[i].function = thread_function;
     }
 }

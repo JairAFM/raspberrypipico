@@ -1,4 +1,10 @@
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "pico/stdlib.h"
+#include "hardware/gpio.h"
+#include "hardware/timer.h"
 
 // Se define cantidad de threads que se pueden crear
 #define THREAD_CREATE 2
@@ -21,18 +27,19 @@ struct thread
     uint32_t tid;                       /* Thread identifier. */
     enum thread_status status;          /* Thread state. */
     const char *name;                   /* Name (for debugging purposes). */
-    int priority;                       /* Priority. */
-    uint64_t time_asleep;               /* Time a Thread remains asleep */
-    void (*function)(void);             /* Function to call */
+    int priority;               void yield(void)
+    uint32_t remaining_time;               /* Time a Thread remains asleep */
+    /*void (*function)(void);        */     /* Function to call */
   };
 
 //Se define control block
 struct thread control_block[THREAD_CREATE];
 
-// Se define init current thread
-volatile uint8_t current_thread;
+// Se define current thread
+struct thread *current_thread;
 
 // Se definen encabezados de funciones
 int randomPriority(void);   /* Returns a random value from 0 to 5 that will be used to determine the initial priority of the thread. */
-void thread_function(void); /* Function to handle the thread */
+void thread_function(struct thread *t); /* Function to handle the thread */
 void thread_init (void);    /* Initializes threads */
+void yield(void);
