@@ -21,16 +21,6 @@ int main()
         thread_function(current_thread);
         // Perform thread scheduling
         scheduler(current_thread);
-        // Update execution time
-        execution_time++;   
-
-        // Check if the execution time has reached a threshold
-        if (execution_time >= 1000)
-        {
-            printf("Execution time limit reached. Exiting.\n");
-            sleep_ms(1000);
-            exit(0);
-        }
     }
 
     return 0;
