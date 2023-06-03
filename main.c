@@ -1,4 +1,4 @@
-#include "kernel/kernel.c"
+#include "./kernel/kernel.c"
 
 
 //Se define el pin del led
@@ -8,7 +8,7 @@
 
 int main()
 {
-    tdio_init_all();
+    stdio_init_all();
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
     thread_init();
@@ -20,7 +20,7 @@ int main()
     {
         thread_function(current_thread);
         // Perform thread scheduling
-        scheduler(current_thread);
+        t_scheduler(current_thread);
     }
 
     return 0;

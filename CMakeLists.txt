@@ -9,6 +9,12 @@ if (NOT PICO_SDK_PATH)
     message(FATAL_ERROR "?PICO_SDK_PATH?")
 endif()
 
+include(FreeRTOS_Kernel_import.cmake)
+
+if (NOT FREERTOS_KERNEL_PATH)
+    message(FATAL_ERROR "?FREERTOS_KERNEL_PATH?")
+endif()
+
 # Se define nombre del proyecto
 project(rtosRpico C CXX ASM)
 

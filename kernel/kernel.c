@@ -1,7 +1,6 @@
-#include "kernel/kernel.h"
-#include "threads/thread.c"
+#include "kernel.h"
 
-void tick_handler(struct repeating_timer *t)
+bool tick_handler(struct repeating_timer *t)
 {
     static uint32_t tick = 0;
     tick++;
@@ -19,9 +18,10 @@ void tick_handler(struct repeating_timer *t)
             control_block[i].remaining_time = 0;
         }
     }
+    return true;
 }
 
-void scheduler(struct thread *t)
+void t_scheduler(struct thread *t)
 {
     int next_thread = 0;
     int actual_priority = t->priority;

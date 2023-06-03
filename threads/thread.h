@@ -5,6 +5,7 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "hardware/timer.h"
+#include "../semaphore/semaphore.c"
 
 // Se define cantidad de threads que se pueden crear
 #define THREAD_CREATE 2
@@ -27,7 +28,8 @@ struct thread
     uint32_t tid;                       /* Thread identifier. */
     enum thread_status status;          /* Thread state. */
     const char *name;                   /* Name (for debugging purposes). */
-    int priority;               void yield(void)
+    int priority; 
+    int priority_original;
     uint32_t remaining_time;               /* Time a Thread remains asleep */
     /*void (*function)(void);        */     /* Function to call */
   };
@@ -42,4 +44,5 @@ struct thread *current_thread;
 int randomPriority(void);   /* Returns a random value from 0 to 5 that will be used to determine the initial priority of the thread. */
 void thread_function(struct thread *t); /* Function to handle the thread */
 void thread_init (void);    /* Initializes threads */
+void sema_acquire(struct semaphore *sema); /* Aquire to semaphore */
 void yield(void);

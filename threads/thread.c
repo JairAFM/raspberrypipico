@@ -1,8 +1,7 @@
-#include "threads/thread.h"
-#include "semaphore/semaphore.c"
+#include "thread.h"
 
 // se define pin del led
-#define LED_PIN 0
+#define LED_PIN PICO_DEFAULT_LED_PIN
 
 int randomPriority(void) {
     srand((unsigned) time(0));
@@ -10,7 +9,6 @@ int randomPriority(void) {
 }
 
 void thread_function(struct thread *t) {
-    ASSERT (t != NULL);
     while(1) {
         if (t->status == THREAD_DYING) // verifica si el thread esta en estatus THREAD_DYING
         {
@@ -76,6 +74,16 @@ void thread_function(struct thread *t) {
     }
 }
 
+void sema_acquire(struct semaphore *sema)
+{
+    // Verifica que el semaforo este disponible
+    while (sema->prior == 0)
+    {
+        yield(); // Release CPU for the other threads
+    }
+    sema->prior = sema->prior - 1;
+}
+
 void yield(void)
 {
     int next_thread = 0;
@@ -111,6 +119,5 @@ void thread_init(void)
         control_block[i].priority = priority;
         control_block[i].priority_original = priority;
         control_block[i].remaining_time = 0;
-        //control_block[i].function = thread_function;
     }
 }
